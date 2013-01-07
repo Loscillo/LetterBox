@@ -15,6 +15,7 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class LetterBox extends JavaPlugin implements Listener{
@@ -60,6 +61,15 @@ public class LetterBox extends JavaPlugin implements Listener{
     				if(!texte.equals(e.getPlayer().getName())){
     					joueurs.remove(e.getPlayer().getName());
     				}
+    				ItemStack[] contenu = coffre.getInventory().getContents();
+    	            int nombre_lettre = 0;
+    	            for(int i = 0; i < contenu.length; i++){
+    	            	if(contenu[i] != null && contenu[i].getType().equals(Material.WRITTEN_BOOK)){
+    	            		nombre_lettre++;
+    	            	}
+    	            }
+    	            panneau.setLine(2, nombre_lettre + " lettres");
+    	            panneau.update();
     			}
             }
         }
