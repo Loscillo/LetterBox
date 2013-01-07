@@ -68,7 +68,8 @@ public class LetterBox extends JavaPlugin implements Listener{
     	            		nombre_lettre++;
     	            	}
     	            }
-    	            panneau.setLine(2, nombre_lettre + " lettres");
+    	            if(nombre_lettre > 1) panneau.setLine(2, nombre_lettre + " lettres");
+    	            else panneau.setLine(2, nombre_lettre + " lettre");
     	            panneau.update();
     			}
             }
@@ -166,10 +167,12 @@ public class LetterBox extends JavaPlugin implements Listener{
 			e.getBlock().breakNaturally();
 			e.getPlayer().sendMessage(ChatColor.GOLD + "[LetterBox] " + ChatColor.RED + "Il faut un coffre en dessous du panneau !");
 		}
-		else if(e.getLine(0).equalsIgnoreCase("[letterbox]") && e.getLine(1).length() == 0){
-			e.setCancelled(true);
-			e.getBlock().breakNaturally();
-			e.getPlayer().sendMessage(ChatColor.GOLD + "[LetterBox] " + ChatColor.RED + "Il faut mettre son pseudonyme sur la deuxi\u00e8me ligne !");
+		else{
+			Sign panneau = (Sign) e.getBlock().getState();
+			panneau.setLine(1, e.getPlayer().getName());
+			panneau.update();
+			panneau.setLine(2, "0 lettre");
+			panneau.update();
 		}
 	}
 }
