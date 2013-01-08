@@ -62,12 +62,8 @@ public class LetterBox extends JavaPlugin implements Listener{
     				texte = panneau.getLine(1);
     				if(!texte.equals(e.getPlayer().getName())){
     					joueurs.remove(e.getPlayer().getName());
-    					if(getServer().getPlayer(texte) != null){
-    						getServer().getPlayer(texte).openInventory(e.getInventory()).close();
-    					}
-    					else{
-    						getServer().getOfflinePlayer(texte).getPlayer().openInventory(e.getInventory()).close();
-    					}
+    					if((proprio = getServer().getOfflinePlayer(texte).getPlayer()) != null)
+    						proprio.openInventory(e.getInventory()).close();
     				}
     				ItemStack[] contenu = coffre.getInventory().getContents();
     	            int nombre_lettre = 0;
