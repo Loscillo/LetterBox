@@ -2,12 +2,15 @@ package fr.jules_cesar.LetterBox;
 
 import java.util.ArrayList;
 
+import net.minecraft.server.v1_4_6.EntityPlayer;
+import net.minecraft.server.v1_4_6.World;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
+import org.bukkit.craftbukkit.v1_4_6.entity.CraftPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -41,7 +44,6 @@ public class LetterBox extends JavaPlugin implements Listener{
     				texte = panneau.getLine(1);
     				if(!texte.equals(e.getPlayer().getName())){
     					joueurs.add(e.getPlayer().getName());
-    					System.out.println(e.getPlayer().getName() + " a ouvert la LetterBox de " + texte);
     				}
     			}
             }
@@ -60,6 +62,12 @@ public class LetterBox extends JavaPlugin implements Listener{
     				texte = panneau.getLine(1);
     				if(!texte.equals(e.getPlayer().getName())){
     					joueurs.remove(e.getPlayer().getName());
+    					if(getServer().getPlayer(texte) != null){
+    						getServer().getPlayer(texte).openInventory(e.getInventory()).close();
+    					}
+    					else{
+    						getServer().getOfflinePlayer(texte).getPlayer().openInventory(e.getInventory()).close();
+    					}
     				}
     				ItemStack[] contenu = coffre.getInventory().getContents();
     	            int nombre_lettre = 0;
@@ -78,13 +86,11 @@ public class LetterBox extends JavaPlugin implements Listener{
 	
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e){
-		if(e.getInventory().getHolder() instanceof Chest && joueurs.contains(e.getWhoClicked().getName()) && e.getRawSlot() < 27){
-			if(!e.getCurrentItem().getType().equals(Material.AIR)){
+		if(e.getInventory().getHolder() instanceof Chest && joueurs.contains(e.getWhoClicked().getName())){
+			if(e.getRawSlot() < 27 && !e.getCurrentItem().getType().equals(Material.AIR)){
 				e.setCancelled(true);
 			}
-		}
-		else if(e.getInventory().getHolder() instanceof Chest && joueurs.contains(e.getWhoClicked().getName()) && e.getRawSlot() > 26){
-			if(!e.getCurrentItem().getType().equals(Material.WRITTEN_BOOK)){
+			else if(e.getRawSlot() > 26 && !e.getCurrentItem().getType().equals(Material.WRITTEN_BOOK)){
 				e.setCancelled(true);
 			}
 		}
@@ -162,17 +168,16 @@ public class LetterBox extends JavaPlugin implements Listener{
 	
 	@EventHandler
 	public void onSignChange(SignChangeEvent e){
-		if(e.getLine(0).equalsIgnoreCase("[letterbox]") && !e.getBlock().getLocation().add(0, -1, 0).getBlock().getType().equals(Material.CHEST)){
-			e.setCancelled(true);
-			e.getBlock().breakNaturally();
-			e.getPlayer().sendMessage(ChatColor.GOLD + "[LetterBox] " + ChatColor.RED + "Il faut un coffre en dessous du panneau !");
-		}
-		else{
-			Sign panneau = (Sign) e.getBlock().getState();
-			panneau.setLine(1, e.getPlayer().getName());
-			panneau.update();
-			panneau.setLine(2, "0 lettre");
-			panneau.update();
+		if(e.getLine(0).equalsIgnoreCase("[letterbox]")){
+			if(!e.getBlock().getLocation().add(0, -1, 0).getBlock().getType().equals(Material.CHEST)){
+				e.setCancelled(true);
+				e.getBlock().breakNaturally();
+				e.getPlayer().sendMessage(ChatColor.GOLD + "[LetterBox] " + ChatColor.RED + "Il faut un coffre en dessous du panneau !");
+			}
+			else{
+				e.setLine(1, e.getPlayer().getName());
+				e.setLine(2, "0 lettre");
+			}
 		}
 	}
 }
